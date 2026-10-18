@@ -1,0 +1,77 @@
+#+title: Development Status & Continuation Handoff
+#+TAGS: me ai aiAndMe
+
+# Provenance (installed once by aiActivity.cs --- not regenerated):
+#   Date:      2026-10-16T21:00:15+00:00
+#   User:      bystar
+#   Templates: /bisos/apps/defaults/ai-templates
+#   Command:   /bisos/venv/py3/devbin/aiActivity.cs -i initiate --activity=bisos-pip
+
+####+BEGIN: b:ai:file/particulars
+* AI Working Context
+  Working Directory: /bisos/git/auth/bxRepos/bisos-pip/devpi
+  File: /bisos/git/auth/bxRepos/bisos-pip/devpi/AI-DevStatus.org
+  Activity: bisos-pip
+  Companion Docs: AI-WORKFLOW.org, AI-Activity.org, AI-DevStatus.org
+####+END:
+
+Last updated: 2026-10-16 (package created and materialized on one host).
+
+This file is a working-state handoff so development can continue on another
+machine (which has this repo but NOT the developer's =~=). It captures the
+architecture, what works, what is untested and the design decisions made so far.
+
+This file is maintained by Claude. Updates are typically triggered by the
+=/bx-status-update= slash command, after major interactions, or before a release.
+
+* Current State
+  - bisos.devpi packages devpi-server 6.20.3 with devpi-web 5.1.1 as a hereWeb-collective CBS/CBM at
+    http://devpi.here, minimal for the rawBisosCbm set: no PyPI mirror, 4 threads. Logins root / devpi
+    and admin / devpi, index admin/dev (rawBisos convention, insecure by design). Created 2026-10-16.
+    Installed editable in bisos3. Not committed yet.
+  - Materialized on this host (Debian 13): both units active; uploads, installs and the web UI verified.
+
+* Architecture
+  - py3/bisos/devpi/devpiInfo.py --- the single source of facts: the isolated venv and its 55-package
+    hashed set (and why it is isolated), paths, banna port, logins and index, the generators of
+    /etc/default/devpi and of the accounts script, the install scripts (isolatedVenvSetupScript,
+    initScript, clientSetupScript), and the drift helpers.
+  - Layout: /bisos/venv/py3/isolated/devpiServer (bystar, setgid bisos); /bisos/pipx/venvs/devpi-client;
+    /etc/default/devpi and /etc/devpi/devpi-accounts.py root:devpi 640 (/etc/devpi 750);
+    /var/lib/devpi/server devpi (750 on /var/lib/devpi).
+  - py3/bin: devpi-sbom.pcs, devpiUsage-sbom.pcs, devpiCbs-sbom.pcs; devpi-sysd.pcs,
+    devpi-accounts-sysd.pcs (oneshot); devpi-here-dns.pcs, devpi-wvd.pcs, devpi-assemble.cs;
+    devpi-cbs.pcs; cbmProc-devpi.spcs; devpiAdmin.cs; quickDevpi.cs.
+  - Port (bisos.banna): devpi=24015 on 127.0.0.1. devpi.here -> 127.0.22.117 -> nginx :80 -> 24015.
+  - Account devpi uid/gid 507.
+
+* What Works
+  Verified on this host, 2026-10-16:
+  - cbs_materialize (and again, a no-op); devpi 81 MB, 9 threads; devpi-accounts created admin and
+    admin/dev on the first run.
+  - Upload: anonymous 401; twine (wheel) and devpi upload (sdist) as admin through nginx.
+  - pip install from admin/dev/+simple/ with --trusted-host; devpi-web lists the package's files.
+  - driftCheck: env file, accounts script (equals the generator), server dir initialized, 2 units,
+    55 pins. verify.sh end to end, all invariants PASS.
+
+* What Is Untested
+  - cbm_materialize at a planted leaf; a second platform; any architecture but amd64; reboot; a bump of
+    the hashed set; devpiUsage-sbom.pcs alone on a host without the server.
+  - devpi-web's documentation upload and search; large uploads near client_max_body_size.
+
+* Key Design Decisions
+  - Minimal (user, 2026-10-16): --no-root-pypi at devpi-init, --threads 4. A real devpi with its PyPI
+    mirror runs in a dedicated VM. Enabled in the rawBisosCbm set.
+  - Isolated venv: devpi-server 6.20.3 requires setuptools<=81 and asc has 84.0.0. Back to asc when that
+    changes.
+  - Accounts by a oneshot unit, not assemble: cbs_materialize runs sbom -> assemble -> units, so the
+    server is not running during assemble. The script is code (rewritten each sbom run), not config.
+  - --restrict-modify root,admin: devpi's default lets anyone create users and indexes.
+  - --outside-url http://devpi.here, so devpi-web's links are right behind nginx.
+  - devpi-client via pipx at its pin (bisos.sbom ignores versions in pipxPkgsList).
+  - Out of chain (under git): the cbm-package-authorship skill; bxGenesis/start/rawBisosCBMs/README.org
+    (the catalog: devpi minimal, enabled, dedicated-VM real home).
+
+# Local Variables:
+# eval: (setq-local toc-org-max-depth 4)
+# End:

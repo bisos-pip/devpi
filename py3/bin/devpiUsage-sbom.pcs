@@ -1,0 +1,113 @@
+#!/usr/bin/env python
+
+""" #+begin_org
+* Panel::  [[file:./py3/panels/bisos.devpi/_nodeBase_/fullUsagePanel-en.org]]
+* Overview and Relevant Pointers
+devpiUsage-sbom.pcs: software bill of materials of the usage side of the devpi capability --- what a
+host needs to use a devpi server, local or remote, as opposed to run one: devpi-client (the devpi
+command: login, indexes, upload, test), installed through pipx at a pinned version. pip and twine
+also work against devpi without it.
+It does not need the server. devpi-sbom.pcs does not pull this sbom in; devpiCbs-sbom.pcs, the
+sbom of devpi-cbs.pcs, runs both.
+#+end_org """
+
+from bisos import b
+from bisos.b import cs
+from bisos.b import b_io
+
+from bisos.sbom import pkgsSeed  # pkgsSeed.plantWithWhich("seedSbom.cs")
+from bisos.devpi.devpiInfo import devpiInfo, clientSetupScript
+
+ap = pkgsSeed.aptPkg
+
+
+def _bash(script: str) -> b.op.Outcome:
+    outcome = b.subProc.WOpW(invedBy=None, log=1).bash(script)
+    if outcome.isProblematic():
+        b_io.eh.badOutcome(outcome)
+    return outcome
+
+
+def devpiClientSetup():
+    """devpi-client at its pin, through pipx. Not an apt package. Idempotent; reinstalls on a bump."""
+    return _bash(clientSetupScript())
+
+
+aptPkgsList = [
+    ap("devpiClientSetup", func=devpiClientSetup),
+]
+
+pkgsSeed.setup(
+    aptPkgsList=aptPkgsList,
+)
+
+
+####+BEGIN: b:py3:cs:cmnd/classHead :cmndName "readme" :extent "verify" :comment "Describe" :parsMand "" :parsOpt "" :argsMin 0 :argsMax 0 :pyInv ""
+""" #+begin_org
+*  _[[elisp:(blee:menu-sel:outline:popupMenu)][±]]_ _[[elisp:(blee:menu-sel:navigation:popupMenu)][Ξ]]_ [[elisp:(outline-show-branches+toggle)][|=]] [[elisp:(bx:orgm:indirectBufOther)][|>]] *[[elisp:(blee:ppmm:org-mode-toggle)][|N]]*  CmndSvc-   [[elisp:(outline-show-subtree+toggle)][||]] <<readme>>  *Describe*  =verify= ro=cli   [[elisp:(org-cycle)][| ]]
+#+end_org """
+class readme(cs.Cmnd):
+    cmndParamsMandatory = [ ]
+    cmndParamsOptional = [ ]
+    cmndArgsLen = {'Min': 0, 'Max': 0,}
+
+    @cs.track(fnLoc=True, fnEntry=True, fnExit=True)
+    def cmnd(self,
+             rtInv: cs.RtInvoker,
+             cmndOutcome: b.op.Outcome,
+    ) -> b.op.Outcome:
+        """Describe"""
+        failed = b_io.eh.badOutcome
+        callParamsDict = {}
+        if self.invocationValidate(rtInv, cmndOutcome, callParamsDict, None).isProblematic():
+            return failed(cmndOutcome)
+####+END:
+        i = devpiInfo
+        descriptionStr = f"""\
+** Scope: the usage side of the devpi capability -- what a host needs to use a devpi server
+   (this host's or another's), not to run one. Part of bisos.devpi.
+
+** What this installs:
+  1) devpiClientSetup: devpi-client {i.clientVersion} through pipx, as {i.clientBin}.
+
+** Standalone: this sbom does not need the server. devpi-sbom.pcs does not pull it in;
+   devpi-cbs.pcs runs both, through devpiCbs-sbom.pcs.
+
+** To use this host's devpi (rawBisos logins):
+       {i.clientBin} use {i.baseUrl}/{i.index}
+       {i.clientBin} login {i.adminUser} --password {i.adminPassword}
+       {i.clientBin} upload              # in a project; or twine with --repository-url {i.uploadUrl}
+       pip install {i.pipIndexArgs} <package>
+
+       devpiUsage-sbom.pcs -i sbom_fullUpdate\
+"""
+        print(descriptionStr)
+
+        return cmndOutcome.set(
+            opError=b.op.OpError.Success,
+            opResults=None,
+        )
+
+
+def examples_csu() -> b.op.Outcome:
+    """Common Usage Examples for this Command-Service Unit"""
+
+    cmnd = cs.examples.cmndEnter
+    literal = cs.examples.execInsert
+    i = devpiInfo
+
+    cmndOutcome = b.op.Outcome()
+
+    cs.examples.menuChapter('*devpi Usage -- sbom Examples*')
+    cmnd('readme', comment=" # An overview short description")
+
+    cs.examples.menuChapter('*Installation*')
+    literal("devpiUsage-sbom.pcs -i sbom_fullUpdate")
+
+    cs.examples.menuChapter('*Use It*')
+    literal(f"{i.clientBin} --version")
+    literal(f"{i.clientBin} use {i.baseUrl}/{i.index}")
+    literal(f"{i.clientBin} login {i.adminUser} --password {i.adminPassword}")
+
+    cs.examples.menuChapter('*End-Of devpi Usage -- sbom Examples*')
+    return cmndOutcome

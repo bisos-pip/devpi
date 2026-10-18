@@ -1,0 +1,53 @@
+#!/usr/bin/env python
+
+####+BEGIN: b:prog:file/particulars :authors ("./inserts/authors-mb.org")
+""" #+begin_org
+* *[[elisp:(org-cycle)][| Particulars |]]* :: Authors, version
+** This File: /bisos/git/bxRepos/bisos-pip/devpi/py3/bin/devpi-accounts-sysd.pcs
+** Authors: Mohsen BANAN, http://mohsen.banan.1.byname.net/contact
+#+end_org """
+####+END:
+
+""" #+begin_org
+* Panel::  [[file:./py3/panels/bisos.devpi/_nodeBase_/fullUsagePanel-en.org]]
+* Overview and Relevant Pointers
+The devpi-accounts.service unit: a oneshot, after devpi.service, that runs the accounts script the
+sbom writes (/etc/devpi/devpi-accounts.py, from devpiInfo.accountsScriptContent()): the admin user
+and the admin/dev index, created if absent. Idempotent.
+It is a unit, not part of the assemble step, because cbs_materialize runs sbom, then assemble, then
+the units: on a first materialization devpi-server is not running when assemble runs.
+#+end_org """
+
+from bisos.debian import systemd_seedInfo
+from bisos.debian import systemd_seed as systemd_seed  # noqa
+
+from bisos.devpi.devpiInfo import devpiInfo, sysdServiceLines
+
+def sysdUnitFileFunc() -> str | None:
+    """Produce the unit file as a string."""
+
+    i = devpiInfo
+    if not ( python := i.venvBin("python") ).exists():
+        return None
+
+    templateStr = f"""
+[Unit]
+Description=devpi accounts: the admin user and its index, created if absent
+After=devpi.service
+Requires=devpi.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+{sysdServiceLines(i.envFile)}ExecStart={python} {i.accountsScript}
+
+[Install]
+WantedBy=multi-user.target
+"""
+    return templateStr
+
+systemd_seedInfo.setup(
+    seedType="sysdSysUnit",
+    sysdUnitName="devpi-accounts",
+    sysdUnitFileFunc=sysdUnitFileFunc,
+)
