@@ -52,7 +52,7 @@ def pkgVersion():
 # b:py3:pypi:setup/requires :extras ; :requirements "requirements.txt" (bring here requirements.txt)
 ####+BEGIN: b:py3:pypi:setup/requires :extras ()
 
-requires = [ 
+requires = [
 "bisos",
 "bisos.b",
 "bisos.banna",
@@ -73,18 +73,18 @@ requires = [
 # b:py3:pypi:setup/scripts :comment
 ####+BEGIN: b:py3:pypi:setup/scripts :comment ""
 
-scripts = [ 
+scripts = [
 'bin/cbmProc-devpi.spcs',
 'bin/devpi-accounts-sysd.pcs',
+'bin/devpiAdmin.cs',
 'bin/devpi-assemble.cs',
 'bin/devpi-cbs.pcs',
+'bin/devpiCbs-sbom.pcs',
 'bin/devpi-here-dns.pcs',
 'bin/devpi-sbom.pcs',
 'bin/devpi-sysd.pcs',
-'bin/devpi-wvd.pcs',
-'bin/devpiAdmin.cs',
-'bin/devpiCbs-sbom.pcs',
 'bin/devpiUsage-sbom.pcs',
+'bin/devpi-wvd.pcs',
 'bin/quickDevpi.cs',
 ]
 ####+END:
@@ -92,7 +92,7 @@ scripts = [
 # b:py3:pypi:setup/dataFiles :comment
 ####+BEGIN: b:py3:pypi:setup/dataFiles :comment "Instead of ./MANIFEST.in or in pyproject.toml"
 
-data_files = [ 
+data_files = [
 ('',  ['lh-agpl3-LICENSE.txt', '_description.org', 'README.rst']),
 ]
 ####+END:
