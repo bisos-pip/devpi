@@ -5,13 +5,13 @@
 * Overview and Relevant Pointers
 devpi-cbs.pcs
 cbs: Capability Bundle Specification  -- Based on a cba-sysd.cs seed
-ws: An Web Service  --- /Service Component/ --- devpi as devpi.here
+ws: An Web Service  --- /Service Component/ --- devpi as devpi.internal
 n:  No Data    -- Materialization is purely based on Realm-BPO
 p:  Platform    -- Materialization is based on Platform-BPO (Site-BPO is not used)
 
 The bundle: devpiCbs-sbom.pcs, which runs devpi-sbom.pcs (account, devpi in its isolated venv,
 config, devpi-init) and devpiUsage-sbom.pcs (devpi-client); the devpi and devpi-accounts units; and
-devpi-assemble.cs (devpi.here dns + nginx vhost).
+devpi-assemble.cs (devpi.internal dns + nginx vhost).
 cba_seed takes one sbom, hence devpiCbs-sbom.pcs rather than both names here.
 #+end_org """
 

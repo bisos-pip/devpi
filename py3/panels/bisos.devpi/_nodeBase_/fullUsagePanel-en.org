@@ -42,7 +42,7 @@
 ** +
 ** Overview
 bisos.devpi runs devpi-server with devpi-web on a BISOS host as a hereWeb-collective capability,
-minimal (no PyPI mirror, 4 threads), at http://devpi.here (admin / devpi, index admin/dev).
+minimal (no PyPI mirror, 4 threads), at http://devpi.internal (admin / devpi, index admin/dev).
 See [[file:../../../../README.org][README.org]] for the logins, the isolated venv, and what is installed where.
 ** Entry points
 - [[file:../../../bin/devpiAdmin.cs][devpiAdmin.cs]] --- hostInfo, servicesInfo, indexInfo, driftCheck

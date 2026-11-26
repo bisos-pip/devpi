@@ -25,8 +25,11 @@ This file is maintained by Claude. Updates are typically triggered by the
 =/bx-status-update= slash command, after major interactions, or before a release.
 
 * Current State
+- 2026-11-26 (from a bisos-pip/b session): every =<name>.here= in this repo is now =<name>.internal=
+  (=.here= is an https-only gTLD in Chrome; bisos-pip/banna AI-WorkPlan.org Stage 4, banna's
+  =tcpPorts.hereFqdn=). Text renamed, not tested here; AI-WorkPlan.org keeps =.here= as history.
   - bisos.devpi packages devpi-server 6.20.3 with devpi-web 5.1.1 as a hereWeb-collective CBS/CBM at
-    http://devpi.here, minimal for the rawBisosCbm set: no PyPI mirror, 4 threads. Logins root / devpi
+    http://devpi.internal, minimal for the rawBisosCbm set: no PyPI mirror, 4 threads. Logins root / devpi
     and admin / devpi, index admin/dev (rawBisos convention, insecure by design). Created 2026-10-16.
     Installed editable in bisos3. Not committed yet.
   - Materialized on this host (Debian 13): both units active; uploads, installs and the web UI verified.
@@ -42,7 +45,7 @@ This file is maintained by Claude. Updates are typically triggered by the
   - py3/bin: devpi-sbom.pcs, devpiUsage-sbom.pcs, devpiCbs-sbom.pcs; devpi-sysd.pcs,
     devpi-accounts-sysd.pcs (oneshot); devpi-here-dns.pcs, devpi-wvd.pcs, devpi-assemble.cs;
     devpi-cbs.pcs; cbmProc-devpi.spcs; devpiAdmin.cs; quickDevpi.cs.
-  - Port (bisos.banna): devpi=24015 on 127.0.0.1. devpi.here -> 127.0.22.117 -> nginx :80 -> 24015.
+  - Port (bisos.banna): devpi=24015 on 127.0.0.1. devpi.internal -> 127.0.22.117 -> nginx :80 -> 24015.
   - Account devpi uid/gid 507.
 
 * What Works
@@ -67,7 +70,7 @@ This file is maintained by Claude. Updates are typically triggered by the
   - Accounts by a oneshot unit, not assemble: cbs_materialize runs sbom -> assemble -> units, so the
     server is not running during assemble. The script is code (rewritten each sbom run), not config.
   - --restrict-modify root,admin: devpi's default lets anyone create users and indexes.
-  - --outside-url http://devpi.here, so devpi-web's links are right behind nginx.
+  - --outside-url http://devpi.internal, so devpi-web's links are right behind nginx.
   - devpi-client via pipx at its pin (bisos.sbom ignores versions in pipxPkgsList).
   - Out of chain (under git): the cbm-package-authorship skill; bxGenesis/start/rawBisosCBMs/README.org
     (the catalog: devpi minimal, enabled, dedicated-VM real home).

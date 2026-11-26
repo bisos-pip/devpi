@@ -135,7 +135,7 @@ class DevpiInfo:
     envFile: pathlib.Path = pathlib.Path("/etc/default/devpi")
 
     listenIp: str = "127.0.0.1"
-    fqdn: str = "devpi.here"
+    fqdn: str = bannaTcpPorts.hereFqdn('devpi')     # devpi.internal
     threads: int = 4
 
     # rawBisos convention: user admin, password the service's name. root is devpi's superuser.
@@ -276,7 +276,7 @@ def envFileContent(info: DevpiInfo = devpiInfo) -> str:
     """The content /etc/default/devpi is generated with. Written only when absent.
 
     ARGS is expanded by the unit's ExecStart as separate words ($ARGS). --outside-url makes the links
-    devpi-web renders point at devpi.here; --restrict-modify lets only root and admin create users and
+    devpi-web renders point at devpi.internal; --restrict-modify lets only root and admin create users and
     indexes (devpi's default lets anyone).
     """
     return (

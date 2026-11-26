@@ -60,10 +60,10 @@ cases = [
     ('minimal: no PyPI mirror',           '--no-root-pypi' in initScript()),
     ('minimal: 4 threads',                '--threads 4' in envFileContent()),
     ('on loopback',                       f'--host 127.0.0.1 --port {i.portNu}' in envFileContent()),
-    ('links point at devpi.here',         '--outside-url http://devpi.here' in envFileContent()),
+    ('links point at devpi.internal',         '--outside-url http://devpi.internal' in envFileContent()),
     ('only root and admin modify',        '--restrict-modify root,admin' in envFileContent()),
     ('accounts script parses',            bool(ast.parse(accountsScriptContent()))),
-    ('pip args trust the plain-HTTP host', '--trusted-host devpi.here' in i.pipIndexArgs),
+    ('pip args trust the plain-HTTP host', '--trusted-host devpi.internal' in i.pipIndexArgs),
     ('rawBisos login admin / devpi',      (i.adminUser, i.adminPassword) == ('admin', 'devpi')),
     ('scripts parse',                     all(subprocess.run(['bash', '-n'], input=s, text=True).returncode == 0
                                               for s in (venvSetupScript(), initScript(), clientSetupScript()))),

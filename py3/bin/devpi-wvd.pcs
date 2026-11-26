@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """ #+begin_org
-* ~[Summary]~ :: A =PlantedCmndService= for devpi.here NGINX virtual-host (capWebVd) --- fronts devpi-server and devpi-web
+* ~[Summary]~ :: A =PlantedCmndService= for devpi.internal NGINX virtual-host (capWebVd) --- fronts devpi-server and devpi-web
 #+end_org """
 
 from bisos.b import cs
@@ -23,7 +23,7 @@ def wvdConfigFunc() -> str:
     """A reverse proxy to devpi-server on loopback.
 
     client_max_body_size: nginx's default of 1m would refuse most uploads. devpi-server builds its
-    links from --outside-url (http://devpi.here), so no header rewriting is needed.
+    links from --outside-url (http://devpi.internal), so no header rewriting is needed.
     """
     return f"""\
 server {{

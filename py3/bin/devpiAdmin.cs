@@ -3,7 +3,7 @@
 
 """ #+begin_org
 * ~[Summary]~ :: A =CmndSvc= for admin-facing information about this host's
-  =devpi.here= devpi-server + devpi-web installation: listener, logins, service status,
+  =devpi.internal= devpi-server + devpi-web installation: listener, logins, service status,
   paths, using the index, and config drift.
 #+end_org """
 
@@ -52,7 +52,7 @@ csInfo['cmndParts'] = 'IcmCmndParts[common] IcmCmndParts[param]'
 """ #+begin_org
 * [[elisp:(org-cycle)][| ~Description~ |]] :: [[file:/bisos/git/auth/bxRepos/blee-binders/bisos-core/PyFwrk/bisos-pip/bisos.cs/_nodeBase_/fullUsagePanel-en.org][BISOS CmndSvcs Panel]]   [[elisp:(org-cycle)][| ]]
 
-This is an admin-facing =CmndSvc= for this host's =devpi.here= installation --- devpi-server with
+This is an admin-facing =CmndSvc= for this host's =devpi.internal= installation --- devpi-server with
 devpi-web, minimal (no PyPI mirror, 4 threads): the listener, the rawBisos logins and where things
 live, links for operating the =devpi-sysd.pcs= and =devpi-accounts-sysd.pcs= units, pip, twine and
 devpi-client against the admin/dev index, and a read-only =driftCheck= of the live config, the units,
@@ -313,7 +313,7 @@ class servicesInfo(cs.Cmnd):
         literal("systemctl status devpi-accounts.service")
         literal("systemctl restart devpi-accounts.service   # runs it again; idempotent")
 
-        cs.examples.menuSection('/devpi.here -- dns and nginx vhost/')
+        cs.examples.menuSection('/devpi.internal -- dns and nginx vhost/')
         literal("devpi-here-dns.pcs -i dnsCap_verify")
         literal("devpi-wvd.pcs -i webVd_verify")
         literal("devpi-assemble.cs -i fullUpdate   # both of the above, updated")

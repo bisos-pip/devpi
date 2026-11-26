@@ -17,7 +17,7 @@
 
 /bisos.devpi/ is a BISOS package for running [[https://devpi.net][devpi]] --- =devpi-server= with its web
 UI, =devpi-web= --- on a BISOS host, as a BISOS Capability Bundle (CBS/CBM) of =systemd=-planted
-Command Services, browsable as =http://devpi.here=.
+Command Services, browsable as =http://devpi.internal=.
 
 In a rawBisosCbm materialization devpi is *minimal*: no PyPI mirror (=devpi-init --no-root-pypi=)
 and 4 threads. That is 81 MB of memory instead of about 500 MB with the mirror, which indexes all
@@ -26,7 +26,7 @@ and is configured there (see =bxGenesis/start/rawBisosCBMs/README.org=).
 
 A planted pointer leaf (=cbmProc.spcs=, at =sys/cbm/collective/hereWeb/devpi/=) subprocess-invokes
 the Capability Bundle Specification, =devpi-cbs.pcs=: the sboms, two units (=devpi= and the
-=devpi-accounts= oneshot), and the assembly step (=devpi.here= dns entry and nginx vhost).
+=devpi-accounts= oneshot), and the assembly step (=devpi.internal= dns entry and nginx vhost).
 
 #+BEGIN: b:org:pypi:readme/pkgDocumentation :pkgName "devpi-cs" :comment "basic"
 
@@ -61,7 +61,7 @@ only by the CBS. It is for the rawBisos layer: minimal, convenient and insecure 
 
 *As of 2026-10-16 it is materialized on one host* (Debian 13): both units active, uploads with twine
 and with devpi-client, installs with pip and browsing in devpi-web verified through
-=http://devpi.here=, =driftCheck= agrees.
+=http://devpi.internal=, =driftCheck= agrees.
 
 * The Logins and the Index
 
@@ -98,7 +98,7 @@ Every fact below lives in one place, =py3/bisos/devpi/devpiInfo.py=.
 | The accounts script          | =/etc/devpi/devpi-accounts.py=         | root:devpi 640 |
 | Server state                 | =/var/lib/devpi/server=                | devpi 750      |
 
-=ARGS= sets =--host 127.0.0.1 --port 24015 --threads 4 --outside-url http://devpi.here
+=ARGS= sets =--host 127.0.0.1 --port 24015 --threads 4 --outside-url http://devpi.internal
 --restrict-modify root,admin=. The EnvironmentFile is written only when absent; the accounts script
 is code and is rewritten by every sbom run. =devpiAdmin.cs -i driftCheck= reports the EnvironmentFile,
 the accounts script, the initialized server directory, both units and all 55 pins.
@@ -116,7 +116,7 @@ the accounts script, the initialized server directory, both units and all 55 pin
 | =devpi-sysd.pcs=          | =devpi-server $ARGS= (waitress inside) | network          |
 | =devpi-accounts-sysd.pcs= | oneshot: =python devpi-accounts.py=    | devpi, Requires= |
 
-Both run as =User=devpi=; logs go to journald. Port 24015 and =devpi.here= (127.0.22.117) come from
+Both run as =User=devpi=; logs go to journald. Port 24015 and =devpi.internal= (127.0.22.117) come from
 =bisos.banna=.
 
 * Installation
@@ -138,12 +138,12 @@ devpi-cbs.pcs -i cbs_materialize           # both sboms + units + assemble
 
 ** Using the Index
 
-pip needs =--trusted-host= for an index on plain HTTP; every =.here= is HTTP.
+pip needs =--trusted-host= for an index on plain HTTP; every =.internal= is HTTP.
 
 #+begin_src bash
-pip install --index-url http://devpi.here/admin/dev/+simple/ --trusted-host devpi.here <package>
-twine upload --repository-url http://devpi.here/admin/dev/ -u admin -p devpi dist/*
-/bisos/pipx/bin/devpi use http://devpi.here/admin/dev
+pip install --index-url http://devpi.internal/admin/dev/+simple/ --trusted-host devpi.internal <package>
+twine upload --repository-url http://devpi.internal/admin/dev/ -u admin -p devpi dist/*
+/bisos/pipx/bin/devpi use http://devpi.internal/admin/dev
 /bisos/pipx/bin/devpi login admin --password devpi
 /bisos/pipx/bin/devpi upload        # in a project
 #+end_src

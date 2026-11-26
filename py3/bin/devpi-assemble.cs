@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """ #+begin_org
-* ~[Summary]~ :: A =CmndSvc= for assembling devpi.here: the .here dns entry and the nginx vhost of devpi.
+* ~[Summary]~ :: A =CmndSvc= for assembling devpi.internal: the .internal dns entry and the nginx vhost of devpi.
 #+end_org """
 
 ####+BEGIN: b:py3:cs:file/dblockControls :classification "cs-mu"
@@ -51,7 +51,7 @@ csInfo['cmndParts'] = 'IcmCmndParts[common] IcmCmndParts[param]'
 * [[elisp:(org-cycle)][| ~Description~ |]] :: [[file:/bisos/git/auth/bxRepos/blee-binders/bisos-core/PyFwrk/bisos-pip/bisos.cs/_nodeBase_/fullUsagePanel-en.org][BISOS CmndSvcs Panel]]   [[elisp:(org-cycle)][| ]]
 
 This is the assemble step of devpi-cbs.pcs: after the sbom has installed devpi
-with devpi-web, it registers =devpi.here= (devpi-here-dns.pcs) and installs and
+with devpi-web, it registers =devpi.internal= (devpi-here-dns.pcs) and installs and
 enables its nginx vhost (devpi-wvd.pcs), which proxies to devpi on loopback.
 
 ** Status: Starting point
@@ -171,8 +171,8 @@ class examples(cs.Cmnd):
         #
 
         cs.examples.menuChapter('=Activation Commands=')
-        cmnd('hereDns', comment=" # devpi.here in /etc/hosts")
-        cmnd('webVirtDom', comment=" # devpi.here nginx vhost -> devpi-server")
+        cmnd('hereDns', comment=" # devpi.internal in /etc/hosts")
+        cmnd('webVirtDom', comment=" # devpi.internal nginx vhost -> devpi-server")
 
         cs.examples.menuChapter('=Full Update=')
         cmnd('fullUpdate', comment=" # hereDns + webVirtDom")
