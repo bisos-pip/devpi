@@ -26,4 +26,6 @@ from bisos.capability import cbmProc_seedInfo
 cbmProc_seedInfo.setup(
     capabilityName="devpi",
     cbsSpec="/bisos/git/bxRepos/bisos-pip/devpi/py3/bin/devpi-cbs.pcs",
+    verifyUnits=["devpi", "devpi-accounts"],
+    verifySpec="devpiAdmin.cs -i driftCheck",
 )

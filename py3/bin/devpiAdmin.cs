@@ -403,6 +403,7 @@ class driftCheck(cs.Cmnd):
         _reportVenvPins(f"{devpiInfo.venv} (isolated venv, hash-pinned)", devpiInfo.venvBin("python"),
                         [(n, v) for n, v, _ in devpiInfo.reqs])
 
+        print(_verdictLine("devpi"))
         return cmndOutcome
 
 
@@ -411,7 +412,7 @@ def _reportScript() -> None:
     path = devpiInfo.accountsScript
     print(f"* {path}")
     if not _exists(path):
-        print("  not installed")
+        _problem("  not installed")
         return
     live = pyRunAs.as_root_readFromFile(path) or ""
     diff = list(difflib.unified_diff(accountsScriptContent().splitlines(), live.splitlines(),
@@ -423,7 +424,10 @@ def _reportScript() -> None:
 
 def _reportServerDir() -> None:
     print(f"* {devpiInfo.serverDir}")
-    print("  initialized (devpi-init)" if _exists(devpiInfo.serverVersionFile) else "  not initialized")
+    if _exists(devpiInfo.serverVersionFile):
+        print("  initialized (devpi-init)")
+    else:
+        _problem("  not initialized")
 
 
 def _installedVersions(python) -> dict:
@@ -442,13 +446,13 @@ def _reportVenvPins(title, python, pins) -> None:
     print(f"* {title}")
     installed = _installedVersions(python)
     if not installed:
-        print("  not installed")
+        _problem("  not installed")
         return
     off = 0
     for name, want in pins:
         got = installed.get(name)
         if got is None:
-            print(f"  missing  {name}   (pinned {want})"); off += 1
+            _problem(f"  missing  {name}   (pinned {want})"); off += 1
         elif got != want:
             print(f"  differs  {name}   pinned={want}   installed={got}"); off += 1
     if not off:
@@ -468,11 +472,11 @@ def _reportKvDrift(livePath, generated) -> None:
     """KEY=VALUE files (EnvironmentFiles): missing / differs / extra, as kafkaAdmin.cs does."""
     print(f"* {livePath}")
     if not _exists(livePath):
-        print("  not installed")
+        _problem("  not installed")
         return
     liveText = pyRunAs.as_root_readFromFile(livePath)
     if not liveText:
-        print(f"  cannot read {livePath}")
+        _problem(f"  cannot read {livePath}")
         return
     drift = kvDrift(liveText, generated)
     for key in drift["missing"]:
@@ -490,13 +494,32 @@ def _reportUnitDrift(unitName, envFile) -> None:
     unitPath = pathlib.Path(f"/etc/systemd/system/{unitName}.service")
     print(f"* {unitPath}")
     if not unitPath.exists():
-        print("  not installed")
+        _problem("  not installed")
         return
     lacking = unitDrift(unitPath.read_text(), envFile)
     for line in lacking:
-        print(f"  missing  {line}")
+        _problem(f"  missing  {line}")
     if not lacking:
         print("  identity lines agree (User, Group, EnvironmentFile)")
+
+
+# The verdict of driftCheck, for bisos.capability's cbm_verify, which reads the last line
+# "<name> verify: ok|fail ..." and not the exit code (bisos-pip/b Stage 4). A diff against a
+# generator is a finding, not a problem: hand overrides are legitimate. A problem is what
+# _problem() prints: something not installed, unreadable, unpinned or missing.
+_problems: list[str] = []
+
+
+def _problem(line: str) -> None:
+    print(line)
+    _problems.append(line.strip())
+
+
+def _verdictLine(name: str) -> str:
+    if not _problems:
+        return f"{name} verify: ok"
+    shown = "; ".join(_problems[:3]) + (f"; and {len(_problems) - 3} more" if len(_problems) > 3 else "")
+    return f"{name} verify: fail {len(_problems)} problem(s): {shown}"
 
 
 ####+BEGIN: blee:bxPanel:foldingSection :outLevel 0 :sep nil :title "Main" :anchor ""  :extraInfo "Framework DBlock"
